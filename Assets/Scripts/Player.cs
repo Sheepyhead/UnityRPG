@@ -10,6 +10,9 @@ public class Player : MovingObject
     public float restartLevelDelay = 1f;
     // Define character stats
     public int strength = 10, dexterity = 10, constitution = 10, intelligence = 10, wisdom = 10, charisma = 10;
+    public int baseAttackBonus = 0;
+
+    // Derived stats
     public int strengthMod
     {
         get { return (strength - 10) / 2; }
@@ -34,6 +37,26 @@ public class Player : MovingObject
     {
         get { return (charisma - 10) / 2; }
     }
+
+    public int armorClass
+    {
+        get { return 10 + dexterityMod; }
+    }
+
+    public int maxHitPoints
+    {
+        get { return 8 + (constitutionMod * 1); }
+    }
+
+    public int attackBonus
+    {
+        get { return baseAttackBonus + strengthMod; }
+    }
+
+    public int damageBonus
+    {
+        get { return strengthMod; }
+    }
     public AudioClip moveSound1;
 
     public AudioClip moveSound2;
@@ -49,15 +72,12 @@ public class Player : MovingObject
     public AudioClip gameOverSound;
 
     private Animator animator;
-    private int food;
+    private int currentHitPoints;
 
     // Use this for initialization
     protected override void Start()
     {
-
-        food = GameManager.instance.playerHitPoints;
-
-        foodText.text = "HP: " + strengthMod;
+        currentHitPoints = maxHitPoints;
 
         animator = GetComponent<Animator>();
 
@@ -66,7 +86,7 @@ public class Player : MovingObject
 
     void OnDisable()
     {
-        GameManager.instance.playerHitPoints = food;
+        GameManager.instance.playerHitPoints = currentHitPoints;
     }
 
     protected override void AttemptMove<T>(int xDir, int yDir)
@@ -109,15 +129,15 @@ public class Player : MovingObject
         }
         else if (other.tag == "Food")
         {
-            food += pointsPerFood;
-            foodText.text = "+" + pointsPerFood + " HP: " + food;
+            currentHitPoints += pointsPerFood;
+            foodText.text = "+" + pointsPerFood + " HP: " + currentHitPoints;
             SoundManager.instance.RandomizeSfx(eatSound1, eatSound2);
             other.gameObject.SetActive(false);
         }
         else if (other.tag == "Soda")
         {
-            food += pointsPerSoda;
-            foodText.text = "+" + pointsPerSoda + " HP: " + food;
+            currentHitPoints += pointsPerSoda;
+            foodText.text = "+" + pointsPerSoda + " HP: " + currentHitPoints;
             SoundManager.instance.RandomizeSfx(drinkSound1, drinkSound2);
             other.gameObject.SetActive(false);
         }
@@ -129,7 +149,7 @@ public class Player : MovingObject
 
     private void CheckIfGameIsOver()
     {
-        if (food <= 0)
+        if (currentHitPoints <= 0)
         {
             SoundManager.instance.RandomizeSfx(gameOverSound);
             SoundManager.instance.musicSource.Stop();
@@ -140,9 +160,9 @@ public class Player : MovingObject
     public void LoseFood(int loss)
     {
         animator.SetTrigger("playerHit");
-        food -= loss;
+        currentHitPoints -= loss;
 
-        foodText.text = "-" + loss + " HP: " + food;
+        foodText.text = "-" + loss + " HP: " + currentHitPoints;
         CheckIfGameIsOver();
     }
 
