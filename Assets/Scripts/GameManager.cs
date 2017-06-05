@@ -5,6 +5,7 @@ using UnityEngine.UI;
 public class GameManager : MonoBehaviour
 {
     public float levelStartDelay = 2f;
+    public Dice dice;
     public static GameManager instance = null;
     public BoardManager boardScript;
     public int playerHitPoints = 10;

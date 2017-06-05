@@ -91,10 +91,6 @@ public class Player : MovingObject
 
     protected override void AttemptMove<T>(int xDir, int yDir)
     {
-        strength++;
-        foodText.text = "StrMod: " + strengthMod;
-
-        base.AttemptMove<T>(xDir, yDir);
 
         RaycastHit2D hit;
 
