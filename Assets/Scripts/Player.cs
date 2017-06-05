@@ -8,6 +8,32 @@ public class Player : MovingObject
     public Text foodText;
     public int wallDamage = 1, pointsPerFood = 10, pointsPerSoda = 20;
     public float restartLevelDelay = 1f;
+    // Define character stats
+    public int strength = 10, dexterity = 10, constitution = 10, intelligence = 10, wisdom = 10, charisma = 10;
+    public int strengthMod
+    {
+        get { return (strength - 10) / 2; }
+    }
+    public int dexterityMod
+    {
+        get { return (dexterity - 10) / 2; }
+    }
+    public int constitutionMod
+    {
+        get { return (constitution - 10) / 2; }
+    }
+    public int intelligenceMod
+    {
+        get { return (intelligence - 10) / 2; }
+    }
+    public int wisdomMod
+    {
+        get { return (wisdom - 10) / 2; }
+    }
+    public int charismaMod
+    {
+        get { return (charisma - 10) / 2; }
+    }
     public AudioClip moveSound1;
 
     public AudioClip moveSound2;
@@ -28,25 +54,25 @@ public class Player : MovingObject
     // Use this for initialization
     protected override void Start()
     {
-        foodText.text = "Food: " + food;
+
+        food = GameManager.instance.playerHitPoints;
+
+        foodText.text = "HP: " + strengthMod;
 
         animator = GetComponent<Animator>();
-
-        food = GameManager.instance.playerFoodPoints;
 
         base.Start();
     }
 
     void OnDisable()
     {
-        GameManager.instance.playerFoodPoints = food;
+        GameManager.instance.playerHitPoints = food;
     }
 
     protected override void AttemptMove<T>(int xDir, int yDir)
     {
-        food--;
-
-        foodText.text = "Food: " + food;
+        strength++;
+        foodText.text = "StrMod: " + strengthMod;
 
         base.AttemptMove<T>(xDir, yDir);
 
@@ -84,14 +110,14 @@ public class Player : MovingObject
         else if (other.tag == "Food")
         {
             food += pointsPerFood;
-            foodText.text = "+" + pointsPerFood + " Food: " + food;
+            foodText.text = "+" + pointsPerFood + " HP: " + food;
             SoundManager.instance.RandomizeSfx(eatSound1, eatSound2);
             other.gameObject.SetActive(false);
         }
         else if (other.tag == "Soda")
         {
             food += pointsPerSoda;
-            foodText.text = "+" + pointsPerSoda + " Food: " + food;
+            foodText.text = "+" + pointsPerSoda + " HP: " + food;
             SoundManager.instance.RandomizeSfx(drinkSound1, drinkSound2);
             other.gameObject.SetActive(false);
         }
@@ -116,7 +142,7 @@ public class Player : MovingObject
         animator.SetTrigger("playerHit");
         food -= loss;
 
-        foodText.text = "-" + loss + " Food: " + food;
+        foodText.text = "-" + loss + " HP: " + food;
         CheckIfGameIsOver();
     }
 
